@@ -63,7 +63,8 @@ void Testbed::Nerf::Training::set_image(int frame_idx, pybind11::array_t<float> 
 
 	py::buffer_info depth_buf = depth_img.request();
 
-	dataset.set_training_image(frame_idx, {img_buf.shape[1], img_buf.shape[0]}, (const void*)img_buf.ptr, (const float*)depth_buf.ptr, depth_scale, false, EImageDataType::Float, EDepthDataType::Float);
+	// dataset.set_training_image(frame_idx, {(int)img_buf.shape[1], (int)img_buf.shape[0]}, (const void*)img_buf.ptr, (const float*)depth_buf.ptr, depth_scale, false, EImageDataType::Float, EDepthDataType::Float);
+	dataset.set_training_image(frame_idx, {(int)img_buf.shape[1], (int)img_buf.shape[0]}, (const void*)img_buf.ptr, nullptr, (const void*)depth_buf.ptr, depth_scale, false, EImageDataType::Float, EDepthDataType::Float, 0.f, false, false, 0, nullptr);
 }
 
 void Testbed::override_sdf_training_data(py::array_t<float> points, py::array_t<float> distances) {
@@ -324,7 +325,7 @@ PYBIND11_MODULE(pyngp, m) {
 		.def(py::init<ETestbedMode, const std::string&, const json&>())
 		.def("create_empty_nerf_dataset", &Testbed::create_empty_nerf_dataset, "Allocate memory for a nerf dataset with a given size", py::arg("n_images"), py::arg("aabb_scale")=1, py::arg("is_hdr")=false)
 		.def("load_training_data", &Testbed::load_training_data, py::call_guard<py::gil_scoped_release>(), "Load training data from a given path.")
-		.def("clear_training_data", &Testbed::clear_training_data, "Clears training data to free up GPU memory.")
+		// .def("clear_training_data", &Testbed::clear_training_data, "Clears training data to free up GPU memory.")
 		// General control
 #ifdef NGP_GUI
 		.def("init_window", &Testbed::init_window, "Init a GLFW window that shows real-time progress and a GUI. 'second_window' creates a second copy of the output in its own window",
